@@ -1,0 +1,66 @@
+parameters:
+- name: workingDirectory
+  type: string
+  default: ''
+
+ 
+
+- name: workspace
+  type: string
+  default: ''
+
+- name: initbackend
+  type: string
+  default: ''
+
+ 
+
+- name: ProjectName
+  type: string
+  default: "Testing"
+
+ 
+
+- name: recursive
+  type: boolean
+  default: 'true'
+
+ 
+
+- name: checkMode
+  type: boolean
+  default: 'false'
+
+ 
+
+- name: provider
+  type: string
+  default: 'azuerm'  
+
+ 
+
+steps:
+
+ 
+
+- script: |
+    terraform fmt
+  workingDirectory: '${{ parameters.workingDirectory}}'
+  displayName: "Format Terraform Configuration Using TF Workspace for ${{ parameters.ProjectName }}"
+  name: "TerraformFmtTFworkspace"
+  condition: eq( ${{ parameters.initbackend }}, 'tfworkspace')
+  env:
+    TF_WORKSPACE: "${{ parameters.workspace}}"
+
+ 
+
+- task: TerraformTaskV4@4
+  displayName: "Format Terraform Configuration Using Azure Backend for ${{ parameters.ProjectName }}"
+  name: 'TerraformFmtAzure'
+  condition: eq( ${{ parameters.initbackend }}, 'azure')
+  inputs:
+    provider: ${{ parameters.provider }}
+    command: 'fmt'
+    workingDirectory: '${{ parameters.workingDirectory }}'
+    recursive: ${{ parameters.recursive }}
+    checkMode: ${{ parameters.checkMode }}
